@@ -16,6 +16,15 @@ function App() {
   const [client2Points, setClient2Points] = useState([]);
   const [client3Points, setClient3Points] = useState([]);
 
+
+  const [client1M, setClient1M] = useState(0);
+  const [client1B, setClient1B] = useState(0);
+  const [client2M, setClient2M] = useState(0);
+  const [client2B, setClient2B] = useState(0);
+  const [client3M, setClient3M] = useState(0);
+  const [client3B, setClient3B] = useState(0);
+
+
   const handleRandomize = () => {
     const newM = Math.random() * 2 - 1; // Random slope between -1 and 1
     const newB = Math.random() * 10 - 5; // Random intercept between -5 and 5
@@ -77,9 +86,55 @@ function App() {
   };
 
   const handleUpdateModelLocally = (index) => {
-    // Dummy function to update the model locally
-    const newModel = { m: Math.random() * 2 - 1, b: Math.random() * 10 - 5 };
-    // Update the client models here
+    var dataPoints = [];
+
+    if (index == 1) {
+      dataPoints = client1Points;
+    } else if (index == 2) {
+      dataPoints = client2Points;
+    }
+    else if (index == 3) {
+      dataPoints = client3Points;
+    }
+
+
+    var globalSlope = line.m;
+    var globalIntercept = line.b;
+
+
+    //run some backprop
+    function getLoss(slope, intercept) {
+      let loss = 0;
+      for (let i = 0; i < dataPoints.length; i++) {
+        const x = dataPoints[i].x;
+        const y = dataPoints[i].y;
+        const predictedY = slope * x + intercept;
+        loss += Math.pow(predictedY - y, 2);
+      }
+      return loss / dataPoints.length;
+    }
+
+    learning_rate = 0.01
+    dm_respect_to_loss = (getLoss(globalSlope + 0.01, globalIntercept) - getLoss(globalSlope, globalIntercept)) / 0.01;
+    db_respect_to_loss = (getLoss(globalSlope, globalIntercept + 0.01) - getLoss(globalSlope, globalIntercept)) / 0.01;
+
+    var new_m = new_m - dm_respect_to_loss * learning_rate;
+    var new_b = new_b - db_respect_to_loss * learning_rate;
+
+    if (index == 1) {
+      setClient1M(new_m);
+      setClient1B(new_b);
+    }
+    else if (index == 2) {
+      setClient2M(new_m);
+      setClient2B(new_b);
+    }
+    else if (index == 3) {
+      setClient3M(new_m);
+      setClient3B(new_b);
+    }
+
+
   };
 
   const handlePushModelToServer = (index) => {
@@ -125,7 +180,7 @@ function App() {
         <h2 className="text-xl font-bold mb-4">Central Server Model</h2>
 
         <div className="flex justify-between mb-2">
-          <span>Current Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)}</span>
+          <span>Current Global Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)}</span>
           <button onClick={handleRandomize} className="bg-blue-500 text-white px-2 py-1 rounded">Randomize Model</button>
         </div>
         <Line data={scatterData} options={options} />
@@ -162,6 +217,8 @@ function App() {
       <div className="grid grid-cols-3 mt-4 gap-4">
         <div className='border-2 p-4'>
           <h2 className="text-xl font-bold mb-4">Client 1</h2>
+          <span>Current Global Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)}</span>
+
           <Plot
             data={[
               {
@@ -174,7 +231,7 @@ function App() {
             layout={{
               width: 400,
               height: 400,
-              title: 'User-Plotted Points',
+              title: 'Client 1 Local Data',
               xaxis: { range: [-10, 10] },
               yaxis: { range: [-10, 10] },
               dragmode: false,
@@ -189,11 +246,13 @@ function App() {
             <button onClick={() => handleAddPoint(1)} className="bg-green-500 text-white px-4 py-2 rounded">Add Point</button>
           </div>
           <button onClick={() => handleUpdateModelLocally(1)} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4">Update Model Locally</button>
-          <button onClick={() => handlePushModelToServer(1)} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Push Model to Server</button>
+          <button onClick={() => handlePushModelToServer(1)} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Send local model to Server</button>
         </div>
 
         <div className='border-2 p-4'>
           <h2 className="text-xl font-bold mb-4">Client 2</h2>
+          <span>Current Global Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)}</span>
+
           <Plot
             data={[
               {
@@ -206,7 +265,7 @@ function App() {
             layout={{
               width: 400,
               height: 400,
-              title: 'User-Plotted Points',
+              title: 'Client 2 Local Data',
               xaxis: { range: [-10, 10] },
               yaxis: { range: [-10, 10] },
               dragmode: false,
@@ -226,6 +285,8 @@ function App() {
 
         <div className='border-2 p-4'>
           <h2 className="text-xl font-bold mb-4">Client 3</h2>
+          <span>Current Global Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)}</span>
+
           <Plot
             data={[
               {
@@ -238,7 +299,7 @@ function App() {
             layout={{
               width: 400,
               height: 400,
-              title: 'User-Plotted Points',
+              title: 'Client 3 Local Data',
               xaxis: { range: [-10, 10] },
               yaxis: { range: [-10, 10] },
               dragmode: false,
