@@ -12,10 +12,13 @@ function App() {
   const [showStats, setShowStats] = useState(false);
   const [data, setData] = useState([{ x: 1, y: 2 }, { x: 2, y: 3 }, { x: 1, y: 4 }]);
   const [line, setLine] = useState({ m: 1, b: 0 });
+  const [client1Points, setClient1Points] = useState([]);
+  const [client2Points, setClient2Points] = useState([]);
+  const [client3Points, setClient3Points] = useState([]);
 
   const handleRandomize = () => {
-    const newM = Math.random() * 2 - 1; // Random -1  1 , SLOPE
-    const newB = Math.random() * 10 - 5; // Random -5 and 5 UINTERCEPT
+    const newM = Math.random() * 2 - 1; // Random slope between -1 and 1
+    const newB = Math.random() * 10 - 5; // Random intercept between -5 and 5
     setLine({ m: newM, b: newB });
     setShowActualData(false);
     setShowStats(false);
@@ -57,7 +60,6 @@ function App() {
         backgroundColor: 'rgba(75, 192, 192, 1)',
         type: 'scatter',
         pointRadius: 6,
-
       },
       {
         label: 'Regression Line',
@@ -74,33 +76,37 @@ function App() {
     ],
   };
 
-
-
-  const handleUpdateModelLocally = () => {
-
-
+  const handleUpdateModelLocally = (index) => {
+    // Dummy function to update the model locally
+    const newModel = { m: Math.random() * 2 - 1, b: Math.random() * 10 - 5 };
+    // Update the client models here
   };
 
-  const handlePushModelToServer = () => {
-
+  const handlePushModelToServer = (index) => {
+    // Function to push the client model to the server
   };
 
-  const [client1Points, setClient1Points] = useState([]);
-  const handleClient1Plot = (event) => {
-    const { clientX, clientY } = event;
-    setClient1Points([...client1Points, { x: clientX, y: clientY }]);
-  };
-  const [client2Points, setClient2Points] = useState([]);
-  const handleClient2Plot = (event) => {
-    const { clientX, clientY } = event;
-    setClient2Points([...client2Points, { x: clientX, y: clientY }]);
-  };
-  const [client3Points, setClient3Points] = useState([]);
-  const handleClient3Plot = (event) => {
-    const { clientX, clientY } = event;
-    setClient3Points([...client3Points, { x: clientX, y: clientY }]);
-  };
+  const handleAddPoint = (clientIndex) => {
+    const xInput = document.getElementById(`xInput${clientIndex}`).value;
+    const yInput = document.getElementById(`yInput${clientIndex}`).value;
 
+    if (isNaN(xInput) || isNaN(yInput)) {
+      toast.error('Please enter valid numerical values for x and y.');
+      return;
+    }
+
+    const newPoint = { x: parseFloat(xInput), y: parseFloat(yInput) };
+
+    setData([...data, newPoint]);
+
+    if (clientIndex === 1) {
+      setClient1Points([...client1Points, newPoint]);
+    } else if (clientIndex === 2) {
+      setClient2Points([...client2Points, newPoint]);
+    } else if (clientIndex === 3) {
+      setClient3Points([...client3Points, newPoint]);
+    }
+  };
 
   const options = {
     scales: {
@@ -116,7 +122,7 @@ function App() {
       <h1 className="text-2xl font-bold mb-4">Federated Learning Demo</h1>
 
       <div className="border p-4 bg-slate-300">
-        <h2 className="text-xl font-bold mb-4"> Centeral Server Model </h2>
+        <h2 className="text-xl font-bold mb-4">Central Server Model</h2>
 
         <div className="flex justify-between mb-2">
           <span>Current Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)}</span>
@@ -153,56 +159,102 @@ function App() {
         )}
       </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      <div className="grid grid-cols-3 mt-4">
-
-
+      <div className="grid grid-cols-3 mt-4 gap-4">
         <div className='border-2 p-4'>
-
           <h2 className="text-xl font-bold mb-4">Client 1</h2>
-
-          <button onClick={() => handleUpdateModelLocally()} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4">Update Model Locally</button>
-          <button onClick={() => handlePushModelToServer()} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Push Model to Server</button>
+          <Plot
+            data={[
+              {
+                x: client1Points.map((point) => point.x),
+                y: client1Points.map((point) => point.y),
+                mode: 'markers',
+                type: 'scatter',
+              },
+            ]}
+            layout={{
+              width: 400,
+              height: 400,
+              title: 'User-Plotted Points',
+              xaxis: { range: [-10, 10] },
+              yaxis: { range: [-10, 10] },
+              dragmode: false,
+              showlegend: false,
+              hovermode: false,
+            }}
+            config={{ staticPlot: true }}
+          />
+          <div className="mt-4">
+            <input type="text" id="xInput1" placeholder="x value" className="mr-2" />
+            <input type="text" id="yInput1" placeholder="y value" className="mr-2" />
+            <button onClick={() => handleAddPoint(1)} className="bg-green-500 text-white px-4 py-2 rounded">Add Point</button>
+          </div>
+          <button onClick={() => handleUpdateModelLocally(1)} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4">Update Model Locally</button>
+          <button onClick={() => handlePushModelToServer(1)} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Push Model to Server</button>
         </div>
 
-
-
-
-
-
         <div className='border-2 p-4'>
-
           <h2 className="text-xl font-bold mb-4">Client 2</h2>
-
-          <button onClick={() => handleUpdateModelLocally()} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4">Update Model Locally</button>
-          <button onClick={() => handlePushModelToServer()} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Push Model to Server</button>
+          <Plot
+            data={[
+              {
+                x: client2Points.map((point) => point.x),
+                y: client2Points.map((point) => point.y),
+                mode: 'markers',
+                type: 'scatter',
+              },
+            ]}
+            layout={{
+              width: 400,
+              height: 400,
+              title: 'User-Plotted Points',
+              xaxis: { range: [-10, 10] },
+              yaxis: { range: [-10, 10] },
+              dragmode: false,
+              showlegend: false,
+              hovermode: false,
+            }}
+            config={{ staticPlot: true }}
+          />
+          <div className="mt-4">
+            <input type="text" id="xInput2" placeholder="x value" className="mr-2" />
+            <input type="text" id="yInput2" placeholder="y value" className="mr-2" />
+            <button onClick={() => handleAddPoint(2)} className="bg-green-500 text-white px-4 py-2 rounded">Add Point</button>
+          </div>
+          <button onClick={() => handleUpdateModelLocally(2)} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4">Update Model Locally</button>
+          <button onClick={() => handlePushModelToServer(2)} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Push Model to Server</button>
         </div>
-
-
-
-
 
         <div className='border-2 p-4'>
-
           <h2 className="text-xl font-bold mb-4">Client 3</h2>
-
-          <button onClick={() => handleUpdateModelLocally()} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4">Update Model Locally</button>
-          <button onClick={() => handlePushModelToServer()} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Push Model to Server</button>
+          <Plot
+            data={[
+              {
+                x: client3Points.map((point) => point.x),
+                y: client3Points.map((point) => point.y),
+                mode: 'markers',
+                type: 'scatter',
+              },
+            ]}
+            layout={{
+              width: 400,
+              height: 400,
+              title: 'User-Plotted Points',
+              xaxis: { range: [-10, 10] },
+              yaxis: { range: [-10, 10] },
+              dragmode: false,
+              showlegend: false,
+              hovermode: false,
+            }}
+            config={{ staticPlot: true }}
+          />
+          <div className="mt-4">
+            <input type="text" id="xInput3" placeholder="x value" className="mr-2" />
+            <input type="text" id="yInput3" placeholder="y value" className="mr-2" />
+            <button onClick={() => handleAddPoint(3)} className="bg-green-500 text-white px-4 py-2 rounded">Add Point</button>
+          </div>
+          <button onClick={() => handleUpdateModelLocally(3)} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4">Update Model Locally</button>
+          <button onClick={() => handlePushModelToServer(3)} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Push Model to Server</button>
         </div>
-
       </div>
 
       <ToastContainer />
