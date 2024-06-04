@@ -17,12 +17,12 @@ function App() {
   const [client3Points, setClient3Points] = useState([]);
 
 
-  const [client1M, setClient1M] = useState(0);
-  const [client1B, setClient1B] = useState(0);
-  const [client2M, setClient2M] = useState(0);
-  const [client2B, setClient2B] = useState(0);
-  const [client3M, setClient3M] = useState(0);
-  const [client3B, setClient3B] = useState(0);
+  const [client1M, setClient1M] = useState(0.00);
+  const [client1B, setClient1B] = useState(0.00);
+  const [client2M, setClient2M] = useState(0.00);
+  const [client2B, setClient2B] = useState(0.00);
+  const [client3M, setClient3M] = useState(0.00);
+  const [client3B, setClient3B] = useState(0.00);
 
 
   const handleRandomize = () => {
@@ -90,6 +90,7 @@ function App() {
 
     if (index == 1) {
       dataPoints = client1Points;
+
     } else if (index == 2) {
       dataPoints = client2Points;
     }
@@ -98,8 +99,18 @@ function App() {
     }
 
 
-    var globalSlope = line.m;
-    var globalIntercept = line.b;
+    if (dataPoints.length == 0) {
+      toast.error('Please add some data points first');
+      return;
+    }
+
+
+    var curRunSlope = line.m;
+    var curRunIntercept = line.b;
+
+    console.log("Global Slope: " + curRunSlope);
+    console.log("Global Intercept: " + curRunIntercept);
+    console.log("Data Points: " + dataPoints);
 
 
     //run some backprop
@@ -114,24 +125,30 @@ function App() {
       return loss / dataPoints.length;
     }
 
-    learning_rate = 0.01
-    dm_respect_to_loss = (getLoss(globalSlope + 0.01, globalIntercept) - getLoss(globalSlope, globalIntercept)) / 0.01;
-    db_respect_to_loss = (getLoss(globalSlope, globalIntercept + 0.01) - getLoss(globalSlope, globalIntercept)) / 0.01;
+    var learning_rate = .01
+    var dm_respect_to_loss = (getLoss(curRunSlope + 0.01, curRunIntercept) - getLoss(curRunSlope, curRunIntercept)) / 0.01;
+    var db_respect_to_loss = (getLoss(curRunSlope, curRunIntercept + 0.01) - getLoss(curRunSlope, curRunIntercept)) / 0.01;
 
-    var new_m = new_m - dm_respect_to_loss * learning_rate;
-    var new_b = new_b - db_respect_to_loss * learning_rate;
+    console.log("dm_respect_to_loss: " + dm_respect_to_loss)
+    console.log("db_respect_to_loss: " + db_respect_to_loss)
+
+    curRunSlope = (curRunSlope - dm_respect_to_loss * learning_rate).toFixed(2);
+    curRunIntercept = (curRunIntercept - db_respect_to_loss * learning_rate).toFixed(2);
+
+    console.log("New Slope: " + curRunSlope);
+    console.log("New Intercept: " + curRunIntercept);
 
     if (index == 1) {
-      setClient1M(new_m);
-      setClient1B(new_b);
+      setClient1M(curRunSlope);
+      setClient1B(curRunIntercept);
     }
     else if (index == 2) {
-      setClient2M(new_m);
-      setClient2B(new_b);
+      setClient2M(curRunSlope);
+      setClient2B(curRunIntercept);
     }
     else if (index == 3) {
-      setClient3M(new_m);
-      setClient3B(new_b);
+      setClient3M(curRunSlope);
+      setClient3B(curRunIntercept);
     }
 
 
@@ -217,7 +234,8 @@ function App() {
       <div className="grid grid-cols-3 mt-4 gap-4">
         <div className='border-2 p-4'>
           <h2 className="text-xl font-bold mb-4">Client 1</h2>
-          <span>Current Global Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)}</span>
+          <span>Current Global Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)} <br /></span>
+          <span>Local Model: y = {client1M}x + {client1B}</span>
 
           <Plot
             data={[
@@ -251,7 +269,8 @@ function App() {
 
         <div className='border-2 p-4'>
           <h2 className="text-xl font-bold mb-4">Client 2</h2>
-          <span>Current Global Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)}</span>
+          <span>Current Global Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)} <br /></span>
+          <span>Local Model: y = {client2M}x + {client2B}</span>
 
           <Plot
             data={[
@@ -285,7 +304,8 @@ function App() {
 
         <div className='border-2 p-4'>
           <h2 className="text-xl font-bold mb-4">Client 3</h2>
-          <span>Current Global Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)}</span>
+          <span>Current Global Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)} <br /></span>
+          <span>Local Model: y = {client3M}x + {client3B}</span>
 
           <Plot
             data={[
