@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Line } from 'react-chartjs-2';
+import Chart from 'chart.js/auto';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Chart as ChartJS, LinearScale, PointElement, LineElement, Tooltip, Legend } from 'chart.js';
