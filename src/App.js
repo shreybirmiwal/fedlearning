@@ -4,13 +4,14 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Chart as ChartJS, LinearScale, PointElement, LineElement, Tooltip, Legend } from 'chart.js';
 import Plot from 'react-plotly.js';
+import { useReducer } from 'react';
 
 ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);
 
 function App() {
   const [showActualData, setShowActualData] = useState(false);
   const [showStats, setShowStats] = useState(false);
-  const [data, setData] = useState([{ x: 1, y: 2 }, { x: 2, y: 3 }, { x: 1, y: 4 }]);
+  const [data, setData] = useState([]);
   const [line, setLine] = useState({ m: 1, b: 0 });
   const [client1Points, setClient1Points] = useState([]);
   const [client2Points, setClient2Points] = useState([]);
@@ -24,10 +25,11 @@ function App() {
   const [client3M, setClient3M] = useState(0.00);
   const [client3B, setClient3B] = useState(0.00);
 
+  const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
 
 
-  const [epochs, setEpochs] = useState(10);
-  const [learningRate, setLearningRate] = useState(0.01);
+  const [epochs, setEpochs] = useState(15);
+  const [learningRate, setLearningRate] = useState(0.1);
 
   const handleRandomize = () => {
     const newM = Math.random() * 2 - 1; // Random slope between -1 and 1
@@ -76,9 +78,9 @@ function App() {
       },
       {
         label: 'Regression Line',
-        data: Array.from({ length: 10 }, (_, i) => ({
-          x: i,
-          y: line.m * i + line.b,
+        data: Array.from({ length: 21 }, (_, i) => ({
+          x: i - 10,
+          y: line.m * (i - 10) + line.b,
         })),
         type: 'line',
         borderColor: 'rgba(255, 99, 132, 1)',
@@ -90,12 +92,146 @@ function App() {
   };
 
   const handleLoadPresetData = () => {
-    // const presetData = [
-    //   { x: 1, y: 2 },
-    //   { x: 2, y: 4 },
-    //   { x: 3, y: 6 },
-    // ];
-    // setData(presetData);
+    setClient1Points([
+      { x: 10, y: -9 },
+      { x: 9, y: -8.7 },
+      { x: 8, y: -8.5 },
+      { x: 7, y: -9 },
+      { x: 6, y: -6.5 },
+      { x: 5, y: -6 },
+      { x: 4, y: -3 },
+      { x: 3, y: -3 },
+      { x: 2, y: -3 },
+      { x: 1, y: -2 },
+      { x: 0, y: 1 },
+      { x: -1, y: 3 },
+      { x: -2, y: 2 },
+      { x: -3, y: 1 },
+      { x: -4, y: 3 },
+      { x: -5, y: 4 },
+      { x: -6, y: 6 },
+      { x: -7, y: 5.3 },
+      { x: -8, y: 7.8 },
+      { x: -9, y: 5.6 },
+      { x: -10, y: 9.8 },
+    ]);
+    setClient2Points([
+      { x: 10, y: -3 },
+      { x: 9, y: 0 },
+      { x: 8, y: -2 },
+      { x: 7, y: -1 },
+      { x: 6, y: -9 },
+      { x: 5, y: 0 },
+      { x: 4, y: 1 },
+      { x: 3, y: 3.1 },
+      { x: 2, y: 2 },
+      { x: 1, y: 2.3 },
+      { x: 0, y: .8 },
+      { x: -1, y: 4 },
+      { x: -2, y: 4 },
+      { x: -3, y: 4.5 },
+      { x: -4, y: 5 },
+      { x: -5, y: 5 },
+      { x: -6, y: 5.6 },
+      { x: -7, y: 4 },
+      { x: -8, y: 7 },
+      { x: -9, y: 7.3 },
+      { x: -10, y: 7 },
+    ]);
+    setClient3Points([
+      { x: 10, y: -18 },
+      { x: 9, y: -16 },
+      { x: 8, y: -15 },
+      { x: 7, y: -14.5 },
+      { x: 6, y: -9 },
+      { x: 5, y: -12.4 },
+      { x: 4, y: -10 },
+      { x: 3, y: -9.1 },
+      { x: 2, y: -8 },
+      { x: 1, y: -3 },
+      { x: 0, y: -6.6 },
+      { x: -1, y: -4 },
+      { x: -2, y: -2 },
+      { x: -3, y: 0 },
+      { x: -4, y: -1 },
+      { x: -5, y: 3 },
+      { x: -6, y: 3.9 },
+      { x: -7, y: 3 },
+      { x: -8, y: 5.1 },
+      { x: -9, y: 8.2 },
+      { x: -10, y: 10 },
+    ]);
+    setData([
+      { x: 10, y: -9 },
+      { x: 9, y: -8.7 },
+      { x: 8, y: -8.5 },
+      { x: 7, y: -9 },
+      { x: 6, y: -6.5 },
+      { x: 5, y: -6 },
+      { x: 4, y: -3 },
+      { x: 3, y: -3 },
+      { x: 2, y: -3 },
+      { x: 1, y: -2 },
+      { x: 0, y: 1 },
+      { x: -1, y: 3 },
+      { x: -2, y: 2 },
+      { x: -3, y: 1 },
+      { x: -4, y: 3 },
+      { x: -5, y: 4 },
+      { x: -6, y: 6 },
+      { x: -7, y: 5.3 },
+      { x: -8, y: 7.8 },
+      { x: -9, y: 5.6 },
+      { x: -10, y: 9.8 },
+      { x: 10, y: -3 },
+      { x: 9, y: 0 },
+      { x: 8, y: -2 },
+      { x: 7, y: -1 },
+      { x: 6, y: -9 },
+      { x: 5, y: 0 },
+      { x: 4, y: 1 },
+      { x: 3, y: 3.1 },
+      { x: 2, y: 2 },
+      { x: 1, y: 2.3 },
+      { x: 0, y: .8 },
+      { x: -1, y: 4 },
+      { x: -2, y: 4 },
+      { x: -3, y: 4.5 },
+      { x: -4, y: 5 },
+      { x: -5, y: 5 },
+      { x: -6, y: 5.6 },
+      { x: -7, y: 4 },
+      { x: -8, y: 7 },
+      { x: -9, y: 7.3 },
+      { x: -10, y: 7 },
+      { x: 10, y: -18 },
+      { x: 9, y: -16 },
+      { x: 8, y: -15 },
+      { x: 7, y: -14.5 },
+      { x: 6, y: -9 },
+      { x: 5, y: -12.4 },
+      { x: 4, y: -10 },
+      { x: 3, y: -9.1 },
+      { x: 2, y: -8 },
+      { x: 1, y: -3 },
+      { x: 0, y: -6.6 },
+      { x: -1, y: -4 },
+      { x: -2, y: -2 },
+      { x: -3, y: 0 },
+      { x: -4, y: -1 },
+      { x: -5, y: 3 },
+      { x: -6, y: 3.9 },
+      { x: -7, y: 3 },
+      { x: -8, y: 5.1 },
+      { x: -9, y: 8.2 },
+      { x: -10, y: 10 },
+    ]);
+
+    forceUpdate();
+
+    console.log(data);
+
+
   };
 
   const handleEpochsChange = (e) => {
@@ -182,6 +318,30 @@ function App() {
   };
 
   const handlePushModelToServer = (index) => {
+
+    var new_M = 0;
+    var new_B = 0;
+
+    if (index == 1) {
+      new_M = client1M;
+      new_B = client1B;
+    }
+    else if (index == 2) {
+      new_M = client2M;
+      new_B = client2B;
+    }
+    else if (index == 3) {
+      new_M = client3M;
+      new_B = client3B;
+    }
+
+
+
+    var curRunSlope = line.m;
+    var curRunIntercept = line.b;
+
+    curRunSlope = (curRunSlope + new_M * update_weight) / 2;
+
   };
 
   const handleAddPoint = (clientIndex) => {
@@ -285,11 +445,11 @@ function App() {
             config={{ staticPlot: true }}
           />
           <div className="mt-4">
-            <input type="text" id="xInput1" placeholder="x value" className="mr-2" />
-            <input type="text" id="yInput1" placeholder="y value" className="mr-2" />
+            <input type="text" id="xInput1" placeholder="x value" className="mr-2 border p-2" />
+            <input type="text" id="yInput1" placeholder="y value" className="mr-2 border p-2" />
             <button onClick={() => handleAddPoint(1)} className="bg-green-500 text-white px-4 py-2 rounded">Add Point</button>
           </div>
-          <button onClick={() => handleUpdateModelLocally(1)} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4">Update Model Locally</button>
+          <button onClick={() => handleUpdateModelLocally(1)} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4 mr-2">Update Model Locally</button>
           <button onClick={() => handlePushModelToServer(1)} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Send local model to Server</button>
         </div>
 
@@ -320,12 +480,12 @@ function App() {
             config={{ staticPlot: true }}
           />
           <div className="mt-4">
-            <input type="text" id="xInput2" placeholder="x value" className="mr-2" />
-            <input type="text" id="yInput2" placeholder="y value" className="mr-2" />
+            <input type="text" id="xInput2" placeholder="x value" className="mr-2 border p-2" />
+            <input type="text" id="yInput2" placeholder="y value" className="mr-2 border p-2" />
             <button onClick={() => handleAddPoint(2)} className="bg-green-500 text-white px-4 py-2 rounded">Add Point</button>
           </div>
-          <button onClick={() => handleUpdateModelLocally(2)} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4">Update Model Locally</button>
-          <button onClick={() => handlePushModelToServer(2)} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Push Model to Server</button>
+          <button onClick={() => handleUpdateModelLocally(2)} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4 mr-2">Update Model Locally</button>
+          <button onClick={() => handlePushModelToServer(2)} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Send local model to Server</button>
         </div>
 
         <div className='border-2 p-4'>
@@ -355,12 +515,12 @@ function App() {
             config={{ staticPlot: true }}
           />
           <div className="mt-4">
-            <input type="text" id="xInput3" placeholder="x value" className="mr-2" />
-            <input type="text" id="yInput3" placeholder="y value" className="mr-2" />
+            <input type="text" id="xInput3" placeholder="x value" className="mr-2 border p-2" />
+            <input type="text" id="yInput3" placeholder="y value" className="mr-2 border p-2" />
             <button onClick={() => handleAddPoint(3)} className="bg-green-500 text-white px-4 py-2 rounded">Add Point</button>
           </div>
-          <button onClick={() => handleUpdateModelLocally(3)} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4">Update Model Locally</button>
-          <button onClick={() => handlePushModelToServer(3)} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Push Model to Server</button>
+          <button onClick={() => handleUpdateModelLocally(3)} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4 mr-2">Update Model Locally</button>
+          <button onClick={() => handlePushModelToServer(3)} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Send local model to Server</button>
         </div>
       </div>
 
@@ -368,13 +528,7 @@ function App() {
       <div className='bg-slate-400 p-5 mt-5'>
         <h2 className='text-xl font-bold'>Settings</h2>
 
-        <div className='mt-4'>
-          <button
-            onClick={handleLoadPresetData}
-            className='bg-blue-500 text-white p-2 rounded'>
-            Load Preset Data Example 1
-          </button>
-        </div>
+
 
         <div className='mt-4'>
           <label className='block text-black'>
@@ -400,6 +554,31 @@ function App() {
             />
           </label>
         </div>
+
+
+        <div className='mt-4'>
+          <label className='block text-black'>
+            Learning Rate:
+            <input
+              type='number'
+              step='0.01'
+              value={learningRate}
+              onChange={handleLearningRateChange}
+              className='ml-2 p-1 rounded'
+            />
+          </label>
+        </div>
+
+
+        <div className='mt-4'>
+          <button
+            onClick={handleLoadPresetData}
+            className='bg-blue-500 text-white p-2 rounded'>
+            Load Preset Data Example 1
+          </button>
+        </div>
+
+
       </div>
 
       <ToastContainer />
