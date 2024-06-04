@@ -25,6 +25,10 @@ function App() {
   const [client3B, setClient3B] = useState(0.00);
 
 
+
+  const [epochs, setEpochs] = useState(10);
+  const [learningRate, setLearningRate] = useState(0.01);
+
   const handleRandomize = () => {
     const newM = Math.random() * 2 - 1; // Random slope between -1 and 1
     const newB = Math.random() * 10 - 5; // Random intercept between -5 and 5
@@ -85,6 +89,23 @@ function App() {
     ],
   };
 
+  const handleLoadPresetData = () => {
+    // const presetData = [
+    //   { x: 1, y: 2 },
+    //   { x: 2, y: 4 },
+    //   { x: 3, y: 6 },
+    // ];
+    // setData(presetData);
+  };
+
+  const handleEpochsChange = (e) => {
+    setEpochs(e.target.value);
+  };
+
+  const handleLearningRateChange = (e) => {
+    setLearningRate(e.target.value);
+  };
+
   const handleUpdateModelLocally = (index) => {
     var dataPoints = [];
 
@@ -113,6 +134,8 @@ function App() {
     console.log("Data Points: " + dataPoints);
 
 
+
+
     //run some backprop
     function getLoss(slope, intercept) {
       let loss = 0;
@@ -120,23 +143,27 @@ function App() {
         const x = dataPoints[i].x;
         const y = dataPoints[i].y;
         const predictedY = slope * x + intercept;
-        loss += Math.pow(predictedY - y, 2);
+        loss += Math.abs(predictedY - y, 2);
       }
       return loss / dataPoints.length;
     }
 
-    var learning_rate = .01
-    var dm_respect_to_loss = (getLoss(curRunSlope + 0.01, curRunIntercept) - getLoss(curRunSlope, curRunIntercept)) / 0.01;
-    var db_respect_to_loss = (getLoss(curRunSlope, curRunIntercept + 0.01) - getLoss(curRunSlope, curRunIntercept)) / 0.01;
 
-    console.log("dm_respect_to_loss: " + dm_respect_to_loss)
-    console.log("db_respect_to_loss: " + db_respect_to_loss)
+    var learning_rate = learningRate;
 
-    curRunSlope = (curRunSlope - dm_respect_to_loss * learning_rate).toFixed(2);
-    curRunIntercept = (curRunIntercept - db_respect_to_loss * learning_rate).toFixed(2);
+    for (let i = 0; i < epochs; i++) {
+      var dm_respect_to_loss = (getLoss(curRunSlope + 0.01, curRunIntercept) - getLoss(curRunSlope, curRunIntercept)) / 0.01;
+      var db_respect_to_loss = (getLoss(curRunSlope, curRunIntercept + 0.01) - getLoss(curRunSlope, curRunIntercept)) / 0.01;
 
-    console.log("New Slope: " + curRunSlope);
-    console.log("New Intercept: " + curRunIntercept);
+      console.log("dm_respect_to_loss: " + dm_respect_to_loss)
+      console.log("db_respect_to_loss: " + db_respect_to_loss)
+
+      curRunSlope = (curRunSlope - dm_respect_to_loss * learning_rate);
+      curRunIntercept = (curRunIntercept - db_respect_to_loss * learning_rate);
+
+      console.log("New Slope: " + curRunSlope);
+      console.log("New Intercept: " + curRunIntercept);
+    }
 
     if (index == 1) {
       setClient1M(curRunSlope);
@@ -155,7 +182,6 @@ function App() {
   };
 
   const handlePushModelToServer = (index) => {
-    // Function to push the client model to the server
   };
 
   const handleAddPoint = (clientIndex) => {
@@ -235,7 +261,7 @@ function App() {
         <div className='border-2 p-4'>
           <h2 className="text-xl font-bold mb-4">Client 1</h2>
           <span>Current Global Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)} <br /></span>
-          <span>Local Model: y = {client1M}x + {client1B}</span>
+          <span>Local Model: y = {client1M.toFixed(2)}x + {client1B.toFixed(2)}</span>
 
           <Plot
             data={[
@@ -270,7 +296,7 @@ function App() {
         <div className='border-2 p-4'>
           <h2 className="text-xl font-bold mb-4">Client 2</h2>
           <span>Current Global Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)} <br /></span>
-          <span>Local Model: y = {client2M}x + {client2B}</span>
+          <span>Local Model: y = {client2M.toFixed(2)}x + {client2B.toFixed(2)}</span>
 
           <Plot
             data={[
@@ -305,7 +331,7 @@ function App() {
         <div className='border-2 p-4'>
           <h2 className="text-xl font-bold mb-4">Client 3</h2>
           <span>Current Global Model: y = {line.m.toFixed(2)}x + {line.b.toFixed(2)} <br /></span>
-          <span>Local Model: y = {client3M}x + {client3B}</span>
+          <span>Local Model: y = {client3M.toFixed(2)}x + {client3B.toFixed(2)}</span>
 
           <Plot
             data={[
@@ -335,6 +361,44 @@ function App() {
           </div>
           <button onClick={() => handleUpdateModelLocally(3)} className="bg-yellow-500 text-white px-4 py-2 rounded mt-4">Update Model Locally</button>
           <button onClick={() => handlePushModelToServer(3)} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Push Model to Server</button>
+        </div>
+      </div>
+
+
+      <div className='bg-slate-400 p-5 mt-5'>
+        <h2 className='text-xl font-bold'>Settings</h2>
+
+        <div className='mt-4'>
+          <button
+            onClick={handleLoadPresetData}
+            className='bg-blue-500 text-white p-2 rounded'>
+            Load Preset Data Example 1
+          </button>
+        </div>
+
+        <div className='mt-4'>
+          <label className='block text-black'>
+            # of Training Trials / Epochs:
+            <input
+              type='number'
+              value={epochs}
+              onChange={handleEpochsChange}
+              className='ml-2 p-1 rounded'
+            />
+          </label>
+        </div>
+
+        <div className='mt-4'>
+          <label className='block text-black'>
+            Learning Rate:
+            <input
+              type='number'
+              step='0.01'
+              value={learningRate}
+              onChange={handleLearningRateChange}
+              className='ml-2 p-1 rounded'
+            />
+          </label>
         </div>
       </div>
 
