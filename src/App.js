@@ -30,6 +30,7 @@ function App() {
 
   const [epochs, setEpochs] = useState(15);
   const [learningRate, setLearningRate] = useState(0.1);
+  const [update_weight, setUpdateWeight] = useState(1);
 
   const handleRandomize = () => {
     const newM = Math.random() * 2 - 1; // Random slope between -1 and 1
@@ -242,6 +243,10 @@ function App() {
     setLearningRate(e.target.value);
   };
 
+  const handleUpdateWeight = (e) => {
+    setUpdateWeight(e.target.value);
+  };
+
   const handleUpdateModelLocally = (index) => {
     var dataPoints = [];
 
@@ -340,7 +345,15 @@ function App() {
     var curRunSlope = line.m;
     var curRunIntercept = line.b;
 
-    curRunSlope = (curRunSlope + new_M * update_weight) / 2;
+    curRunSlope = (curRunSlope + new_M * update_weight) / (1 + update_weight);
+    curRunIntercept = (curRunIntercept + new_B * update_weight) / (1 + update_weight);
+
+    line.m = curRunSlope;
+    line.b = curRunIntercept;
+
+    forceUpdate();
+
+    toast.success('Global model updated successfully');
 
   };
 
@@ -558,12 +571,12 @@ function App() {
 
         <div className='mt-4'>
           <label className='block text-black'>
-            Learning Rate:
+            Client Weight (how much global model changes with local model):
             <input
               type='number'
               step='0.01'
-              value={learningRate}
-              onChange={handleLearningRateChange}
+              value={update_weight}
+              onChange={handleUpdateWeight}
               className='ml-2 p-1 rounded'
             />
           </label>
