@@ -22,6 +22,5 @@ YouTube Video
 
 
 ## How does it work?
-Blog Post
 [Blog Post](https://shreybirmiwal.vercel.app/blog/2)
 
