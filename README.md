@@ -22,8 +22,3 @@ iPhone data can be pooled together to create AI about health, SIRI, etc, without
 YouTube Video
 [![Demo](https://github.com/user-attachments/assets/b4be2ed9-124a-4666-b70f-d9cccecdcbd1)](https://youtu.be/aflfj00Rc-w)
 
-
-
-## How does it work?
-[Blog Post](https://shreybirmiwal.vercel.app/blog/2)
-
