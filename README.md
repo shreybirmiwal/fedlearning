@@ -3,6 +3,9 @@
 
 A sandbox website to see how a federated learning ML model is trained accross multiple servers without leaking data
 
+### Links
+[Blog Post](https://shreybirmiwal.vercel.app/blog/2)
+[Website](https://fedlearning.vercel.app)
 
 
 #### What is federated learning? 
